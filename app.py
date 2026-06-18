@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request
-import os
+import gradio as gr
+import numpy as np
+from PIL import Image
 
 from utils.food_detector import detect_food
 from utils.nutrition import get_nutrition
@@ -7,105 +8,111 @@ from utils.bmi import calculate_bmi
 from utils.diet import recommend_diet
 from utils.workout import recommend_workout
 
-app = Flask(__name__)
 
-# Save uploaded images inside static folder
-UPLOAD_FOLDER = "static/uploads"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+def predict(age, gender, weight, height, goal, health_issue, food_pref, image):
 
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    image_path = "temp.jpg"
+    image.save(image_path)
 
+    # Food detection
+    food_name, confidence = detect_food(image_path)
 
-@app.route("/")
-def home():
-    return render_template("index.html")
+    nutrition = get_nutrition(food_name)
+    if nutrition is None:
+        nutrition = {"Calories": "N/A", "Protein": "N/A", "Carbs": "N/A", "Fat": "N/A"}
 
+    # BMI
+    bmi = calculate_bmi(weight, height)
 
-@app.route("/predict", methods=["POST"])
-def predict():
+    if bmi < 18.5:
+        bmi_status = "🟡 Underweight"
+    elif bmi < 25:
+        bmi_status = "🟢 Normal"
+    elif bmi < 30:
+        bmi_status = "🟠 Overweight"
+    else:
+        bmi_status = "🔴 Obese"
 
-    try:
-        age = request.form["age"]
-        gender = request.form["gender"]
-        weight = float(request.form["weight"])
-        height = float(request.form["height"])
-        goal = request.form["goal"]
-        health_issue = request.form["health_issue"]
-        food_pref = request.form["food_pref"]
+    diet_plan = recommend_diet(goal)
+    workout_plan = recommend_workout(goal)
 
-        image = request.files["food_image"]
+    return f"""
+🍽️ **FOOD RESULT**
 
-        if image.filename == "":
-            return "Please upload an image"
+Food: **{food_name}**
+Confidence: **{round(confidence*100,2)}%**
 
-        filename = image.filename
+---
 
-        image_path = os.path.join(
-            app.config["UPLOAD_FOLDER"],
-            filename
-        )
+🥗 **NUTRITION**
+Calories: {nutrition['Calories']}
+Protein: {nutrition['Protein']}
+Carbs: {nutrition['Carbs']}
+Fat: {nutrition['Fat']}
 
-        image.save(image_path)
+---
 
-        # Food Detection
-        food_name, confidence = detect_food(image_path)
+⚖️ **BMI REPORT**
+BMI: {round(bmi,2)}
+Status: {bmi_status}
 
-        # Nutrition Data
-        nutrition = get_nutrition(food_name)
+---
 
-        if nutrition is None:
-            nutrition = {
-                "Calories": "N/A",
-                "Protein": "N/A",
-                "Carbs": "N/A",
-                "Fat": "N/A"
-            }
+🥗 **DIET**
+{diet_plan}
 
-        # BMI
-        bmi = calculate_bmi(weight, height)
+---
 
-        if bmi < 18.5:
-            bmi_status = "Underweight"
-        elif bmi < 25:
-            bmi_status = "Normal"
-        elif bmi < 30:
-            bmi_status = "Overweight"
-        else:
-            bmi_status = "Obese"
-
-        # Recommendations
-        diet_plan = recommend_diet(goal)
-        workout_plan = recommend_workout(goal)
-
-        return render_template(
-            "result.html",
-
-            age=age,
-            gender=gender,
-            goal=goal,
-            health_issue=health_issue,
-            food_pref=food_pref,
-
-            food_name=food_name,
-            confidence=round(confidence, 2),
-
-            calories=nutrition["Calories"],
-            protein=nutrition["Protein"],
-            carbs=nutrition["Carbs"],
-            fat=nutrition["Fat"],
-
-            bmi=round(bmi, 2),
-            bmi_status=bmi_status,
-
-            diet_plan=diet_plan,
-            workout_plan=workout_plan,
-
-            image_file=filename
-        )
-
-    except Exception as e:
-        return f"Error: {str(e)}"
+🏋️ **WORKOUT**
+{workout_plan}
+"""
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+demo = gr.Interface(
+    fn=predict,
+
+    # ================= INPUT UI =================
+    inputs=[
+        gr.Number(label="Age"),
+
+        gr.Radio(
+            choices=["Male", "Female", "Other"],
+            label="Gender"
+        ),
+
+        gr.Number(label="Weight (kg)"),
+        gr.Number(label="Height (cm)"),
+
+        gr.Dropdown(
+            choices=["Weight Loss", "Muscle Gain", "Maintenance"],
+            label="Fitness Goal"
+        ),
+
+        gr.Radio(
+            choices=[
+                "None",
+                "Diabetes",
+                "BP",
+                "Heart Problem",
+                "Thyroid",
+                "Other"
+            ],
+            label="Health Issues"
+        ),
+
+        gr.Textbox(
+            label="Food Preference (Optional)",
+            placeholder="e.g. Vegetarian / Vegan / High Protein / Low Carb"
+        ),
+
+        gr.Image(type="pil", label="Upload Food Image")
+    ],
+
+    # ================= OUTPUT =================
+    outputs=gr.Markdown(label="📊 Your Personalized Report"),
+
+    title="🍎 AI Workout & Diet Planner",
+    description="Get Food Prediction + BMI + Diet + Workout Plan in seconds!"
+)
+
+demo.launch()
