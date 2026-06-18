@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Analysis Result</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>📊 Analysis Result</h1>
+
+    <div class="result-card">
+
+        <h2>User Information</h2>
+
+        <p><strong>Age:</strong> {{ age }}</p>
+
+        <p><strong>Gender:</strong> {{ gender }}</p>
+
+        <p><strong>Goal:</strong> {{ goal }}</p>
+
+        <p><strong>Health Condition:</strong>
+        {{ health_issue }}</p>
+
+        <p><strong>Food Preference:</strong>
+        {{ food_pref }}</p>
+
+    </div>
+
+    <div class="result-card">
+
+        <h2>Detected Food: {{ food_name }}</h2>
+
+        <h3>Confidence: {{ confidence }}%</h3>
+
+
+        <img src="{{ url_for('static',
+        filename='uploads/' + image_file) }}"
+             class="food-image"
+            alt="Uploaded Food"
+            width="300">
+
+    </div>
+
+    <div class="result-card">
+
+        <h2>Nutrition Information</h2>
+
+        <p><strong>Calories:</strong>
+        {{ calories }} kcal</p>
+
+        <p><strong>Protein:</strong>
+        {{ protein }} g</p>
+
+        <p><strong>Carbs:</strong>
+        {{ carbs }} g</p>
+
+        <p><strong>Fat:</strong>
+        {{ fat }} g</p>
+
+    </div>
+
+    <div class="result-card">
+
+        <h2>BMI Analysis</h2>
+
+        <p><strong>BMI:</strong>
+        {{ bmi }}</p>
+
+        <p><strong>Status:</strong>
+        {{ bmi_status }}</p>
+
+    </div>
+
+    <div class="result-card">
+
+        <h2>Recommended Diet</h2>
+
+        <ul>
+            {% for item in diet_plan %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+
+    </div>
+
+    <div class="result-card">
+
+        <h2>Recommended Workout</h2>
+
+        <ul>
+            {% for item in workout_plan %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+
+    </div>
+
+    <div class="result-card">
+
+        <h2>Health Tips</h2>
+
+        {% if goal == "Weight Loss" %}
+
+            <p class="warning">
+            Reduce sugary drinks and fried foods.
+            </p>
+
+        {% elif goal == "Muscle Gain" %}
+
+            <p class="success">
+            Increase protein intake and strength training.
+            </p>
+
+        {% else %}
+
+            <p class="success">
+            Maintain a balanced diet and regular exercise.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    <br>
+
+    <a href="/">
+        <button>
+            Analyze Another Food
+        </button>
+    </a>
+
+</div>
+
+</body>
+</html>

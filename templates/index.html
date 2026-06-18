@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fitness & Nutrition Planner</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🥗 AI Fitness & Nutrition Planner</h1>
+
+    <form action="/predict"
+          method="POST"
+          enctype="multipart/form-data">
+
+        <label>Age</label>
+        <input type="number"
+               name="age"
+               required>
+
+        <label>Gender</label>
+        <select name="gender" required>
+            <option value="">Select</option>
+            <option>Male</option>
+            <option>Female</option>
+        </select>
+
+        <label>Weight (kg)</label>
+        <input type="number"
+               step="0.1"
+               name="weight"
+               required>
+
+        <label>Height (cm)</label>
+        <input type="number"
+               step="0.1"
+               name="height"
+               required>
+
+        <label>Fitness Goal</label>
+        <select name="goal" required>
+            <option value="">Select Goal</option>
+            <option>Weight Loss</option>
+            <option>Muscle Gain</option>
+            <option>Maintenance</option>
+        </select>
+
+        <label>Health Condition</label>
+        <select name="health_issue">
+            <option>None</option>
+            <option>Diabetes</option>
+            <option>Hypertension</option>
+            <option>Thyroid</option>
+            <option>Obesity</option>
+        </select>
+
+        <label>Food Preference</label>
+        <select name="food_pref">
+            <option>Veg</option>
+            <option>Non-Veg</option>
+        </select>
+
+        <label>Upload Food Image</label>
+        <input type="file"
+               name="food_image"
+               accept="image/*"
+               required>
+
+        <button type="submit">
+            Analyze Food
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
