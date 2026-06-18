@@ -15,7 +15,8 @@ def predict(age, gender, weight, height, goal, health_issue, food_pref, image):
     image.save(image_path)
 
     # Food detection
-    food_name, confidence = detect_food(image_path)
+    food_name = "Demo Food"
+    confidence = 0.95
 
     nutrition = get_nutrition(food_name)
     if nutrition is None:

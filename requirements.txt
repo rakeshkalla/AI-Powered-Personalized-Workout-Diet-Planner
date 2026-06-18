@@ -1,5 +1,4 @@
-gradio
-tensorflow
-numpy
+gradio==4.44.0
+huggingface_hub==0.20.3
+numpy==1.26.4
 pillow
-opencv-python
