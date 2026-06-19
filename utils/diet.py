@@ -1,4 +1,12 @@
-def recommend_diet(goal):
+def recommend_diet(goal, bmi):
+    if bmi < 18.5:
+        return "High calorie diet: rice, nuts, milk, banana"
+    
+    elif bmi < 25:
+        return "Balanced diet: vegetables, protein, fruits"
+
+    else:
+        return "Low calorie diet: salads, fruits, oats"
 
     if goal == "Weight Loss":
 
