@@ -1,7 +1,10 @@
 import os
 import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
+import numpy as np
+
+def detect_food(img_path):
+    # temporary mock prediction for deployment
+    return "biryani", 92.5
 
 # Load trained model
 model = load_model("models/food_classifier.keras")
